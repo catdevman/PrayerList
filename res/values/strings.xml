@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Prayer List</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_prayer">Add Prayer</string>
+    <string name="title_activity_prayer">Prayer</string>
+    <string name="edit_prayer">Edit Prayer</string>
+    <string name="view_scripture">View Scripture for prayer category</string>
+    <string name="view_scripture_condensed">View Scripture</string>
+    <string name="prayer_name">Enter prayer name</string>
+    <string name="prayer_description">Enter description for prayer</string>
+    <string name="choose_priority">Choose priority</string>
+
+    <string-array name="categories">
+        <item></item>
+        <item>Sexual Immorality</item>
+        <item>Wisdom</item>
+        <item>Health</item>
+        <item>Blessing</item>
+        <item>Guidance</item>
+        <item>Decisions</item>
+        <item>Stress</item>
+        <item>Work</item>
+        <item>Love</item>
+    </string-array>
+
+    <string name="menu_save">Save</string>
+    <string name="prayer_update">Update Prayer</string>
+    <string name="save_prayer">Save Prayer</string>
+    <string name="delete_prayer">Delete Prayer</string>
+
+</resources>
