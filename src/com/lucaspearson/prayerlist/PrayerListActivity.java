@@ -1,5 +1,7 @@
 package com.lucaspearson.prayerlist;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -12,7 +14,7 @@ import android.widget.Toast;
 
 public class PrayerListActivity extends FragmentActivity implements
 		PrayersFragment.OnPrayerSelectedListener {
-	int mCurrentID = -1;
+	long mCurrentID = -1;
 	PrayersFragment firstFragment;
 	PrayerData prayerData;
 	String name, description, category;
@@ -68,17 +70,31 @@ public class PrayerListActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.add_prayer:
-			savePrayer();
+			addPrayer();
 			break;
 		case R.id.action_settings:
+			//Launch dialog that will save to SharedPreferences
 			break;
 		case R.id.save_prayer:
-
+			savePrayer();
+			updateLoader();
 			break;
 		case R.id.delete_prayer:
 			deletePrayer();
 			mCurrentID = -1;
+			updateLoader();
 			clearDetailView();
+			break;
+		case R.id.view_scripture:
+			if (mCurrentID != -1) {
+				String biblegateway = "http://mobile.biblegateway.com/keyword/?search="
+						+ spCategory.getSelectedItem().toString()
+						+ "&version1=NIV&searchtype=all&limit=none&wholewordsonly=no";
+				startActivity(new Intent(Intent.ACTION_VIEW,
+						Uri.parse(biblegateway)));
+			} else {
+
+			}
 			break;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -86,15 +102,69 @@ public class PrayerListActivity extends FragmentActivity implements
 		return false;
 	}
 
+	private int savePrayer() {
+		if (mCurrentID != -1) {
+			try {
+				name = etName.getText().toString();
+				priority = ratingbarPriority.getProgress();
+				category = spCategory.getSelectedItem().toString();
+				description = etDescription.getText().toString();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			boolean flag = prayerData.updatePrayerWithID(mCurrentID, name,
+					description, priority, category);
+			if (flag) {
+				Toast.makeText(getBaseContext(), "Prayer was updated!",
+						Toast.LENGTH_SHORT).show();
+				return 0;
+			} else {
+				Toast.makeText(getBaseContext(), "Prayer was not updated!",
+						Toast.LENGTH_SHORT).show();
+				return 2;
+			}
+		} else {
+			try {
+				name = etName.getText().toString();
+				priority = ratingbarPriority.getProgress();
+				category = spCategory.getSelectedItem().toString();
+				description = etDescription.getText().toString();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			long id = prayerData.insertData(name, description, priority,
+					category);
+			if (id != -1) {
+				Toast.makeText(getBaseContext(),
+						"Prayer was created with id: " + id, Toast.LENGTH_SHORT)
+						.show();
+				mCurrentID = id;
+				return 0;
+			} else {
+				Toast.makeText(getBaseContext(), "Prayer was not created",
+						Toast.LENGTH_SHORT).show();
+				return 1;
+			}
+
+		}
+
+	}
+
+	private void updateLoader() {
+		Intent intent = new Intent();
+		intent.setAction(PrayerData.LOADER_RELOAD);
+		sendBroadcast(intent);
+	}
+
 	private void clearDetailView() {
 		etName.setText("");
 		ratingbarPriority.setRating(2);
-		spCategory.setSelection(1);
+		spCategory.setSelection(0);
 		etDescription.setText("");
-		//this.recreate();
+
 	}
 
-	public void onPrayerSelected(int position, int id) {
+	public void onPrayerSelected(int position, long id) {
 		// The user selected the headline of an article from the
 		// HeadlinesFragment
 		mCurrentID = id;
@@ -117,7 +187,7 @@ public class PrayerListActivity extends FragmentActivity implements
 			PrayerDetailFragment newFragment = new PrayerDetailFragment();
 			Bundle args = new Bundle();
 			args.putInt(PrayerDetailFragment.ARG_POSITION, position);
-			args.putInt(PrayerDetailFragment.ARG_ID, id);
+			args.putLong(PrayerDetailFragment.ARG_ID, id);
 			newFragment.setArguments(args);
 			FragmentTransaction transaction = getSupportFragmentManager()
 					.beginTransaction();
@@ -134,37 +204,16 @@ public class PrayerListActivity extends FragmentActivity implements
 		}
 	}
 
+	private void addPrayer() {
+		clearDetailView();
+		mCurrentID = -1;
+	}
+
 	private void deletePrayer() {
-		if(mCurrentID != -1){
-		prayerData.deletePrayerWithID(mCurrentID);
+		if (mCurrentID != -1) {
+			prayerData.deletePrayerWithID(mCurrentID);
 		}
 	}
 
-	private int savePrayer() {
-		try {
-			name = etName.getText().toString();
-			priority = ratingbarPriority.getProgress();
-			category = spCategory.getSelectedItem().toString();
-			description = etDescription.getText().toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		long id = prayerData.insertData(name, description, priority, category);
-		if (id != -1) {
-			Toast.makeText(getBaseContext(),
-					"Prayer was created with id: " + id, Toast.LENGTH_SHORT)
-					.show();
-			etName.setText("");
-			ratingbarPriority.setRating(2);
-			spCategory.setSelection(0);
-			etDescription.setText("");
-			this.recreate();
-			return 0;
-		} else {
-			Toast.makeText(getBaseContext(), "Prayer was not created",
-					Toast.LENGTH_SHORT).show();
-			return 1;
-		}
-	}
 
 }

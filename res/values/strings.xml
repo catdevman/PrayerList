@@ -6,7 +6,7 @@
     <string name="add_prayer">Add Prayer</string>
     <string name="title_activity_prayer">Prayer</string>
     <string name="edit_prayer">Edit Prayer</string>
-    <string name="view_scripture">View Scripture for prayer category</string>
+    <string name="view_scripture">View Scripture</string>
     <string name="view_scripture_condensed">View Scripture</string>
     <string name="prayer_name">Enter prayer name</string>
     <string name="prayer_description">Enter description for prayer</string>
@@ -29,5 +29,8 @@
     <string name="prayer_update">Update Prayer</string>
     <string name="save_prayer">Save Prayer</string>
     <string name="delete_prayer">Delete Prayer</string>
+    <string name="pick_category">Pick a category</string>
+    <string name="user_prefs">User Preferences</string>
+    <string name="pref_pick_bible">Pick a Bible version</string>
 
 </resources>

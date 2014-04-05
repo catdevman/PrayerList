@@ -1,70 +1,33 @@
 package com.lucaspearson.prayerlist;
 
-import java.util.ArrayList;
 
 import android.app.Activity;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
-public class PrayersFragment extends ListFragment {
-	ArrayList<Prayer> results = null;
+public class PrayersFragment extends ListFragment implements
+		LoaderCallbacks<Cursor> {
+	private static final int LOADER_ID_FOR_DB = 5;
 	OnPrayerSelectedListener mCallback;
-	PrayerData prayerData;
+	SimpleCursorAdapter simpleCursorAdapter;
 
-	// The container Activity must implement this interface so the frag can
 	// deliver messages
 	public interface OnPrayerSelectedListener {
 		/** Called by PrayersFragment when a list item is selected */
-		public void onPrayerSelected(int position, int id);
+		public void onPrayerSelected(int position, long id);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		prayerData = new PrayerData(PrayersFragment.this.getActivity());
-		// We need to use a different list item layout for devices older than
-		// Honeycomb
-		int layout = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? android.R.layout.simple_list_item_activated_1
-				: android.R.layout.simple_list_item_1;
-		/*
-		 * Use database to make array adapter
-		 */
-		setupTable();
-		if (results != null) {
-			setListAdapter(new ArrayAdapter<Prayer>(this.getActivity(), layout,
-					results));
-
-		} else {
-			TextView tv = new TextView(getActivity());
-			tv.setText("No Prayers created please press add prayer or sign in.");
-			getListView().setEmptyView(tv);
-		}
-	}
-
-	private void setupTable() {
-		results = new ArrayList<Prayer>();
-		Cursor c = prayerData.returnAllCursorByPriority();
-		int count = c.getCount();
-		c.moveToFirst();
-		for (Integer j = 0; j < count; j++) {
-			Prayer p = new Prayer();
-			p.setId(c.getInt(c.getColumnIndex("_id")));
-			p.setName(c.getString(c.getColumnIndex("name")));
-			p.setPriority(c.getInt(c.getColumnIndex("priority")));
-			p.setCategory(c.getString(c.getColumnIndex("category")));
-			p.setDescription(c.getString(c.getColumnIndex("description")));
-			results.add(p);
-
-			c.moveToNext();
-		}
-
+		this.getLoaderManager().initLoader(LOADER_ID_FOR_DB, null, this);
+		setupListView();
 	}
 
 	@Override
@@ -96,11 +59,59 @@ public class PrayersFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		// Notify the parent activity of selected item
-		Prayer p = (Prayer) results.get(position);
-		int pID = p.getId();
-		mCallback.onPrayerSelected(position, pID);
+	
+		mCallback.onPrayerSelected(position, id);
 		// Set the item as checked to be highlighted when in two-pane layout
 		getListView().setItemChecked(position, true);
+	}
+	
+//	private void registerListClickCallback(){
+//		ListView lv = getListView();
+//		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				mCallback.onPrayerSelected(position, id);
+//				// Set the item as checked to be highlighted when in two-pane layout
+//				getListView().setItemChecked(position, true);
+//			}
+//		});
+//	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		PrayerData prayerData = new PrayerData(getActivity());
+		return prayerData;
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
+		switch (loader.getId()) {
+		case LOADER_ID_FOR_DB:
+			populateListView(c);
+			break;
+		}
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		simpleCursorAdapter.swapCursor(null);
+	}
+
+	private void populateListView(Cursor c) {
+		simpleCursorAdapter.swapCursor(c);
+	}
+
+	private void setupListView() {
+		String[] dataColumns = { "name", "category" };
+		int[] viewIDs = { R.id.item_name, R.id.item_category };
+
+		simpleCursorAdapter = new SimpleCursorAdapter(getActivity(),
+				R.layout.list_item, null, dataColumns, viewIDs, 0);
+		setListAdapter(simpleCursorAdapter);
+		// setListAdapter(new ArrayAdapter<Prayer>(this.getActivity(), layout,
+		// results));
 	}
 
 }

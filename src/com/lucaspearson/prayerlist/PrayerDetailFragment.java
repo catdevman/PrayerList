@@ -17,7 +17,7 @@ public class PrayerDetailFragment extends Fragment {
 	final static String ARG_POSITION = "position";
 	final static String ARG_ID = "id";
 	int mCurrentPosition = -1;
-	int mCurrentID = -1;
+	long mCurrentID = -1;
 	PrayerData prayerData = null;
 	EditText etName, etDescription;
 	RatingBar ratingbarPriority;
@@ -68,7 +68,7 @@ public class PrayerDetailFragment extends Fragment {
 		}
 	}
 
-	public void updateArticleView(int position, int id) {
+	public void updateArticleView(int position, long id) {
 		/*
 		 * Use id to get Prayer to fill out view
 		 */
@@ -113,7 +113,7 @@ public class PrayerDetailFragment extends Fragment {
 		// Save the current article selection in case we need to recreate the
 		// fragment
 		outState.putInt(ARG_POSITION, mCurrentPosition);
-		outState.putInt(ARG_ID, mCurrentID);
+		outState.putLong(ARG_ID, mCurrentID);
 	}
 
 }

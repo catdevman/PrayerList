@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bible_list">
+        <item name="NIV">New Internation Version</item>
+        <item name="KJV">King James Version</item>
+        <item name="ASV">American Standard Version</item>
+        <item name="NKJV">New King James Version</item>
+    </string-array>
+    <string-array name="bible_list_values">
+        <item name="NIV">NIV</item>
+        <item name="KJV">KJV</item>
+        <item name="ASV">ASV</item>
+        <item name="NKJV">NKJV</item>
+    </string-array>
+</resources>

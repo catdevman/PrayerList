@@ -1,0 +1,8 @@
+<preference-headers
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header android:fragment="com.lucaspearson.prayerlist.PrayerActivity$Prefs1Fragment"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="Prefs 1"
+            android:summary="An example of some preferences." />
+</preference-headers>
