@@ -30,6 +30,7 @@ public class PrayersFragment extends ListFragment implements
 		setupListView();
 	}
 
+
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -38,6 +39,8 @@ public class PrayersFragment extends ListFragment implements
 		// list item
 		// (We do this during onStart because at the point the listview is
 		// available.)
+
+		setupListView();
 		if (getFragmentManager().findFragmentById(R.id.article_fragment) != null) {
 			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		}
@@ -81,7 +84,13 @@ public class PrayersFragment extends ListFragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		PrayerData prayerData = new PrayerData(getActivity());
+		PrayerData prayerData = null;
+		try {
+			prayerData = new PrayerData(getActivity());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return prayerData;
 	}
 

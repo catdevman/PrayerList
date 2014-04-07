@@ -82,27 +82,22 @@ public class PrayerDetailFragment extends Fragment {
 		mCurrentID = id;
 
 		Cursor c = prayerData.returnCursorWithID(mCurrentID);
-		c.moveToFirst();
-		Prayer p = new Prayer();
-		p.setId(c.getInt(c.getColumnIndex("_id")));
-		p.setName(c.getString(c.getColumnIndex("name")));
-		p.setPriority(c.getInt(c.getColumnIndex("priority")));
-		p.setCategory(c.getString(c.getColumnIndex("category")));
-		p.setDescription(c.getString(c.getColumnIndex("description")));
+		if (c.moveToFirst()) {
+			Prayer p = new Prayer();
+			p.setId(c.getInt(c.getColumnIndex("_id")));
+			p.setName(c.getString(c.getColumnIndex("name")));
+			p.setPriority(c.getInt(c.getColumnIndex("priority")));
+			p.setCategory(c.getString(c.getColumnIndex("category")));
+			p.setDescription(c.getString(c.getColumnIndex("description")));
 
-//		Toast.makeText(
-//				getActivity(),
-//				"id: " + p.getId() + " name: " + p.getName() + " priority: "
-//						+ p.getPriority() + " category: " + p.getCategory()
-//						+ " description: " + p.getDescription(),
-//				Toast.LENGTH_LONG).show();
-		etName.setText(p.getName());
-		ratingbarPriority.setRating(p.getPriority());
-		List<String> listOfCategories = Arrays.asList(getResources()
-				.getStringArray(R.array.categories));
-		int categoryID = listOfCategories.indexOf(p.getCategory());
-		spCategory.setSelection(categoryID);
-		etDescription.setText(p.getDescription());
+			etName.setText(p.getName());
+			ratingbarPriority.setRating(p.getPriority());
+			List<String> listOfCategories = Arrays.asList(getResources()
+					.getStringArray(R.array.categories));
+			int categoryID = listOfCategories.indexOf(p.getCategory());
+			spCategory.setSelection(categoryID);
+			etDescription.setText(p.getDescription());
+		}
 
 	}
 
