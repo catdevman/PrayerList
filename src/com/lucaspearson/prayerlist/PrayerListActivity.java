@@ -1,6 +1,13 @@
 package com.lucaspearson.prayerlist;
 
+import java.util.Arrays;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -22,6 +29,11 @@ public class PrayerListActivity extends FragmentActivity implements
 	EditText etName, etDescription;
 	RatingBar ratingbarPriority;
 	Spinner spCategory;
+	String biblePref;
+	SharedPreferences prefs;
+
+	final static String BIBLE_PREFERENCE = "biblePref";
+	final static String DEFAULT_BIBLE_PREFERENCE = "NIV";
 
 	/** Called when the activity is first created. */
 	@Override
@@ -33,6 +45,8 @@ public class PrayerListActivity extends FragmentActivity implements
 		etDescription = (EditText) findViewById(R.id.etDescription);
 		ratingbarPriority = (RatingBar) findViewById(R.id.ratingbarPriority);
 		spCategory = (Spinner) findViewById(R.id.spCategory);
+		prefs = this.getSharedPreferences("com.lucaspearson.prayerlist",
+				Context.MODE_PRIVATE);
 		// Check whether the activity is using the layout version with
 		// the fragment_container FrameLayout. If so, we must add the first
 		// fragment
@@ -73,27 +87,94 @@ public class PrayerListActivity extends FragmentActivity implements
 			addPrayer();
 			break;
 		case R.id.action_settings:
-			//Launch dialog that will save to SharedPreferences
+			// Launch dialog that will save to SharedPreferences
+			biblePref = prefs.getString(BIBLE_PREFERENCE,
+					DEFAULT_BIBLE_PREFERENCE);
+			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+			alertDialog.setTitle("Shared Preferences");
+			alertDialog
+					.setSingleChoiceItems(R.array.bible_list_values, 0,
+							new OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String[] strArray = getResources()
+											.getStringArray(
+													R.array.bible_list_values);
+									biblePref = strArray[which];
+								}
+							})
+					.setPositiveButton("Save",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									// Save to Shared Preferences!
+									prefs.edit()
+											.putString(BIBLE_PREFERENCE,
+													biblePref).apply();
+
+								}
+							})
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									// if this button is clicked, just close
+									// the dialog box and do nothing
+									dialog.cancel();
+								}
+							});
+			alertDialog.create().show();
+
 			break;
 		case R.id.save_prayer:
 			savePrayer();
 			updateLoader();
 			break;
 		case R.id.delete_prayer:
-			deletePrayer();
-			mCurrentID = -1;
-			updateLoader();
-			clearDetailView();
+			AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(this);
+
+			alertDialog2.setTitle("Delete Prayer");
+			alertDialog2.setPositiveButton("OK",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+
+							deletePrayer();
+							mCurrentID = -1;
+							updateLoader();
+							clearDetailView();
+
+						}
+					}).setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// if this button is clicked, just close
+							// the dialog box and do nothing
+							dialog.cancel();
+						}
+					});
+			alertDialog2.create().show();
 			break;
 		case R.id.view_scripture:
-			if (mCurrentID != -1) {
+
+			String bPref = prefs.getString(BIBLE_PREFERENCE,
+					DEFAULT_BIBLE_PREFERENCE);
+			String search = spCategory.getSelectedItem().toString();
+			if (mCurrentID != -1 && !search.equals("Select one...")) {
 				String biblegateway = "http://mobile.biblegateway.com/keyword/?search="
-						+ spCategory.getSelectedItem().toString()
-						+ "&version1=NIV&searchtype=all&limit=none&wholewordsonly=no";
+						+ search
+						+ "&version1="
+						+ bPref
+						+ "&searchtype=all&limit=none&wholewordsonly=no";
 				startActivity(new Intent(Intent.ACTION_VIEW,
 						Uri.parse(biblegateway)));
-			} else {
 
+			} else {
+				Toast.makeText(getApplicationContext(),
+						"Please set a category and save the prayer",
+						Toast.LENGTH_LONG).show();
 			}
 			break;
 		default:
@@ -214,6 +295,5 @@ public class PrayerListActivity extends FragmentActivity implements
 			prayerData.deletePrayerWithID(mCurrentID);
 		}
 	}
-
 
 }

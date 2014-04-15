@@ -13,7 +13,7 @@
     <string name="choose_priority">Choose priority</string>
 
     <string-array name="categories">
-        <item></item>
+        <item>Select one...</item>
         <item>Sexual Immorality</item>
         <item>Wisdom</item>
         <item>Health</item>
