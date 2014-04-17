@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.lucaspearson.prayerlist.PrayerListActivity" >
+
+    <item
+        android:id="@+id/phone_action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
+    <item android:id="@+id/phone_add_prayer" android:title="@string/add_prayer" android:showAsAction="always" android:icon="@android:drawable/ic_menu_add"></item>
+    <item android:id="@+id/phone_save_prayer" android:title="@string/save_prayer" android:icon="@android:drawable/ic_menu_save" android:showAsAction="always"></item>
+    <item android:id="@+id/phone_delete_prayer" android:showAsAction="ifRoom" android:title="@string/delete_prayer" android:icon="@android:drawable/ic_menu_delete"></item>
+    <item android:id="@+id/phone_view_scripture" android:title="@string/view_scripture"></item>
+
+</menu>

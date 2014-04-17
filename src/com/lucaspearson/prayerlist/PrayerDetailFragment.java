@@ -83,13 +83,16 @@ public class PrayerDetailFragment extends Fragment {
 
 		Cursor c = prayerData.returnCursorWithID(mCurrentID);
 		if (c.moveToFirst()) {
+			//moveToFirst will point the Cursor on the first item
+			//Make a Prayer then put the id, name, priority, category, description from the Cursor
+			 
 			Prayer p = new Prayer();
 			p.setId(c.getInt(c.getColumnIndex("_id")));
 			p.setName(c.getString(c.getColumnIndex("name")));
 			p.setPriority(c.getInt(c.getColumnIndex("priority")));
 			p.setCategory(c.getString(c.getColumnIndex("category")));
 			p.setDescription(c.getString(c.getColumnIndex("description")));
-
+			// set the views on screen with the data from the Prayer
 			etName.setText(p.getName());
 			ratingbarPriority.setRating(p.getPriority());
 			List<String> listOfCategories = Arrays.asList(getResources()

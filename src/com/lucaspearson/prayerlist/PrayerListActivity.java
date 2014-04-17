@@ -1,7 +1,5 @@
 package com.lucaspearson.prayerlist;
 
-import java.util.Arrays;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
@@ -76,8 +75,16 @@ public class PrayerListActivity extends FragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.prayer_list, menu);
-		return true;
+		if (findViewById(R.id.fragment_container) == null) {
+			getMenuInflater().inflate(R.menu.prayer_list, menu);
+			return true;
+		} else {
+			// This is a phone menu has to be different because we can't talk to
+			// the second fragment on a phone because it does not exist
+			getMenuInflater().inflate(R.menu.phone_prayer_list, menu);
+
+			return true;
+		}
 	}
 
 	@Override
@@ -85,6 +92,26 @@ public class PrayerListActivity extends FragmentActivity implements
 		switch (item.getItemId()) {
 		case R.id.add_prayer:
 			addPrayer();
+			break;
+		case R.id.phone_add_prayer:
+			//Replace current fragment with details fragment
+			PrayerDetailFragment newFragment = new PrayerDetailFragment();
+			Bundle args = new Bundle();
+			args.putLong(PrayerDetailFragment.ARG_ID, mCurrentID);
+			newFragment.setArguments(args);
+			
+			FragmentTransaction transaction = getSupportFragmentManager()
+					.beginTransaction();
+
+			// Replace whatever is in the fragment_container view with this
+			// fragment,
+			// and add the transaction to the back stack so the user can
+			// navigate back
+			transaction.replace(R.id.fragment_container, newFragment);
+			transaction.addToBackStack(null);
+
+			// Commit the transaction
+			transaction.commit();
 			break;
 		case R.id.action_settings:
 			// Launch dialog that will save to SharedPreferences
@@ -129,7 +156,53 @@ public class PrayerListActivity extends FragmentActivity implements
 			alertDialog.create().show();
 
 			break;
+		case R.id.phone_action_settings:
+			biblePref = prefs.getString(BIBLE_PREFERENCE,
+					DEFAULT_BIBLE_PREFERENCE);
+			AlertDialog.Builder phoneAlertDialog = new AlertDialog.Builder(this);
+
+			phoneAlertDialog.setTitle("Shared Preferences");
+			phoneAlertDialog
+					.setSingleChoiceItems(R.array.bible_list_values, 0,
+							new OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									String[] strArray = getResources()
+											.getStringArray(
+													R.array.bible_list_values);
+									biblePref = strArray[which];
+								}
+							})
+					.setPositiveButton("Save",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									// Save to Shared Preferences!
+									prefs.edit()
+											.putString(BIBLE_PREFERENCE,
+													biblePref).apply();
+
+								}
+							})
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									// if this button is clicked, just close
+									// the dialog box and do nothing
+									dialog.cancel();
+								}
+							});
+			phoneAlertDialog.create().show();
+
+			break;
 		case R.id.save_prayer:
+			savePrayer();
+			updateLoader();
+			break;
+		case R.id.phone_save_prayer:
 			savePrayer();
 			updateLoader();
 			break;
@@ -157,6 +230,8 @@ public class PrayerListActivity extends FragmentActivity implements
 					});
 			alertDialog2.create().show();
 			break;
+		case R.id.phone_delete_prayer:
+			break;
 		case R.id.view_scripture:
 
 			String bPref = prefs.getString(BIBLE_PREFERENCE,
@@ -177,10 +252,24 @@ public class PrayerListActivity extends FragmentActivity implements
 						Toast.LENGTH_LONG).show();
 			}
 			break;
+		case R.id.phone_view_scripture:
+			break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 		return false;
+	}
+	@Override
+	public void onAttachFragment(Fragment fragment) {
+		// TODO Auto-generated method stub
+		super.onAttachFragment(fragment);
+		}
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		if(menu.equals(R.menu.phone_prayer_list)){
+			
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	private int savePrayer() {
